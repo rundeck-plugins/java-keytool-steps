@@ -1,0 +1,61 @@
+name: java-keytool-steps
+version: 1.0.0
+rundeckPluginVersion: 1.2
+author: alexh
+date: Tue Feb 16 2016
+providers:
+  - name: java-keytool-list-step
+    service: WorkflowNodeStep
+    title: 'java / keytool / list'
+    description: 'Run keytool list action.'
+    plugin-type: script
+    script-interpreter: /usr/bin/env bash
+    script-file: keytoolw
+    script-args: --action list --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path}
+    config:
+      - type: String
+        name: jdk_home
+        title: JDK Home
+        description: 'path to the jdk'
+      - type: String
+        name: keystore_path
+        title: Keystore Path
+        description: 'path to the jdk keystore'
+      - type: String
+        name: alias
+        title: Alias
+        description: 'alias name'         
+      - type: String
+        name: keystore_password
+        title: keystore_password
+        description: 'path to keystore password'
+        renderingOptions:
+          selectionAccessor: "STORAGE_PATH"
+          valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+          storage-path-root: "keys"
+  - name: java-keytool-printcert-step
+    service: WorkflowNodeStep
+    title: 'java / keytool / printcert'
+    description: 'Run keytool printcert action.'
+    plugin-type: script
+    script-interpreter: /usr/bin/env bash
+    script-file: keytoolw
+    script-args: --action printcert --jdk-home ${config.jdk_home} --cert-path ${config.cert_path}
+    config:
+      - type: String
+        name: jdk_home
+        title: JDK Home
+        description: 'path to the jdk'
+      - type: String
+        name: cert_path
+        title: Certificate Path
+        description: 'path to the jdk keystore'
+      - type: String
+        name: alias
+        title: Alias
+        description: 'alias name'         
+      - type: String
+        name: keystore_password
+        title: keystore_password
+        description: 'path to keystore password'
+

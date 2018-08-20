@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -eu
+
+usage() {
+	printf "Usage: --action <%s> [--jdk-home <>] [--keystore-path <>] [--cert-path <>]\n" "$*"
+}
+
+options_parse() {
+  
+    unrecognized_args=()
+
+    while (( "$#" > 0 ))
+    do
+        OPT="$1"
+        case "$OPT" in
+        	--action)        action=$2        ; shift 2 ;;
+            --jdk-home)      jdk_home=$2      ; shift 2 ;;
+            --keystore-path) keystore_path=$2 ; shift 2 ;;
+            --cert-path)     cert_path=$2     ; shift 2 ;;
+            # help option
+            -\?|--help)
+                usage
+                exit 2
+                ;;
+            # unrecognized arguments
+            *)
+              unrecognized_args+=("$OPT")
+              shift
+              ;;
+        esac
+    done
+
+    # Set defaultable options.
+
+    # Check required options are set
+	if [[ " ${actions[@]} " =~ " ${action} " ]]
+	then
+		:
+	else
+		printf "Action unrecoginized '%s'\n" "$action"
+		return 2
+	fi
+    return 0
+}
+
+
+check_keytool() {
+	local jdk=$1 keytool=''
+	if [[ -x "$jdk/bin/keytool" ]]
+	then 
+		keytool=$jdk/bin/keytool
+	else
+		# Check the $PATH for it.
+		if ! keytool=$(type -p keytool)
+		then 
+			:
+		fi
+	fi
+	if [[ -z "${keytool:-}" ]]; then
+		printf "ERROR: keytool executable not found."
+		return 1
+	fi
+	printf "%s" "$keytool"
+	return 0
+}
+
+
+# Check which certificates are in a Java keystore
+action:list() {
+	local keystore=$1 alias=$2 password=$3
+	local clopts=(-list -v -keystore "$keystore")
+	[[ -n "$alias" ]] && clopts+=(-alias "$alias")
+	[[ -n "$password" ]] && clopts+=(-storepass "$password")
+	# Run it.
+	command "$jdk_home/bin/keytool" "${clopts[@]}"
+}
+
+action:printcert() {
+	local cert_file=$1
+	command "$jdk_home/bin/keytool" -printcert -v -file "$cert_file"
+}
+
+
+check_keytool "$jdk_home"
+
+declare -r actions=(list printcert)
+
+if ! options_parse "$@"
+then
+	usage "${actions[@]}"
+	exit 2
+fi
+
+declare -r keystore_password="${RD_CONFIG_KEYSTORE_PASSWORD:-}"
+
+case "$action" in	
+	list) 
+		action:list "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password"
+	;;
+	printcert) 
+		action:printcert "$cert_path"
+	;;	
+	*) usage
+	;;
+esac
+
+exit $?
