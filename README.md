@@ -2,11 +2,11 @@
 
 ## Pre-Requisite
 
-The remote node's SSH server must be configured to accept RD_* environment variables. This can be read about [here|<https://linux.die.net/man/5/sshd_config]>.
+The remote node's SSH server must be configured to accept RD_* environment variables. This can be read about [here](<https://linux.die.net/man/5/sshd_config>).
 
 Summary, on the remote node:
 
-1. Edit /etc/ssh/sshd_config and add this:
+1. Edit `/etc/ssh/sshd_config` and add this:
 
     ```shell
     # Accept Rundeck environment variables
@@ -18,13 +18,13 @@ Summary, on the remote node:
 
 ## Building
 
-To build the plugin, simply zip it but exclude the .git files:
+1. To build the plugin, simply zip it but exclude the .git files:
 
     ```shell
     zip -r java-keytool-steps.zip java-keytool-steps -x *.git*
     ```
 
-Then copy the zip file to the plugins directory:
+2. Then copy the zip file to the plugins directory:
 
     ```shell
     cp java-keytool-steps.zip $RDECK_BASE/libext
