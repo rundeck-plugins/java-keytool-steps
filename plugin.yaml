@@ -14,27 +14,27 @@ providers:
     script-args: --action list --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path}
     config:
       - type: String
-        name: jdk_home
-        title: JDK Home
-        description: 'path to the jdk'
-      - type: String
         name: keystore_path
-        title: Keystore Path
-        description: 'path to the jdk keystore'
-        required: true
-      - type: String
-        name: alias
-        title: Alias
-        description: 'alias name'         
+        title: Keystore Path*
+        description: 'Path to the jdk keystore'
+        required: true        
       - type: String
         name: keystore_password
-        title: keystore_password
-        description: 'path to keystore password'
+        title: Keystore Password*
+        description: 'Path to keystore password'
         required: true
         renderingOptions:
           selectionAccessor: "STORAGE_PATH"
           valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
           storage-path-root: "keys"
+      - type: String
+        name: jdk_home
+        title: JDK Home
+        description: 'Path to the jdk. If left blank, will search for the jdk in $PATH.'
+      - type: String
+        name: alias
+        title: Alias
+        description: 'Alias name. If left blank, will list all certificates in the keystore.' 
   - name: java-keytool-printcert-step
     service: RemoteScriptNodeStep
     title: 'java / keytool / printcert'
@@ -45,11 +45,11 @@ providers:
     script-args: --action printcert --jdk-home ${config.jdk_home} --cert-path ${config.cert_path}
     config:
       - type: String
+        name: cert_path
+        title: Certificate Path*
+        description: 'Path to the jdk keystore'
+        required: true
+      - type: String
         name: jdk_home
         title: JDK Home
-        description: 'path to the jdk'
-      - type: String
-        name: cert_path
-        title: Certificate Path
-        description: 'path to the jdk keystore'
-        required: true
+        description: 'Path to the jdk. If left blank, will search for the jdk in $PATH'
