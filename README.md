@@ -20,6 +20,10 @@ Summary, on the remote node:
 
 ### Actions
 
+#### java / keytool / checkExpiration
+
+For a given keystore/alias, displays the expiration date by parsing the output from `keytool -list -v -keystore keystore.jks -alias mydomain`.
+
 #### java / keytool / list
 
 Either checks which certificates are in a Java keystore, or gives information about a particular keystore entry.

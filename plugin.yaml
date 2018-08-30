@@ -53,3 +53,35 @@ providers:
         name: jdk_home
         title: JDK Home
         description: 'Path to the jdk. If left blank, will search for the jdk in $PATH'
+  - name: java-keytool-checkExp-step
+    service: RemoteScriptNodeStep
+    title: 'java / keytool / checkExpiration'
+    description: 'Check certificate expiration date.'
+    plugin-type: script
+    script-interpreter: /usr/bin/env bash
+    script-file: keytoolw
+    script-args: --action checkExp --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path}
+    config:
+      - type: String
+        name: keystore_path
+        title: Keystore Path*
+        description: 'Path to the jdk keystore'
+        required: true        
+      - type: String
+        name: keystore_password
+        title: Keystore Password*
+        description: 'Path to keystore password'
+        required: true
+        renderingOptions:
+          selectionAccessor: "STORAGE_PATH"
+          valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+          storage-path-root: "keys"
+      - type: String
+        name: alias
+        title: Alias*
+        description: 'Alias name' 
+        required: true
+      - type: String
+        name: jdk_home
+        title: JDK Home
+        description: 'Path to the jdk. If left blank, will search for the jdk in $PATH.'
