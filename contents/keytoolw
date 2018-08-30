@@ -83,9 +83,21 @@ action:printcert() {
 	command $keytool -printcert -v -file "$cert_file"
 }
 
+action:checkExp() {
+	# Build the arguments list
+	local keystore=$1 alias=$2 password=$3 keytoolOut=''
+	local clopts=( -list -v -keystore "$keystore")
+	[[ -n "$alias" ]] && clopts+=( -alias "$alias")
+	[[ -n "$password" ]] && clopts+=( -storepass "$password")
+
+	# Run it.
+	keytoolOut=$(command $keytool "${clopts[@]}") || { echo $keytoolOut; exit 1; }
+	printf "%s" "$keytoolOut" | awk -v alias="$alias" -Funtil: '/until:/ {print alias ": Expires on" $2;exit;}'
+}
+
 #Begin script execution
 
-declare -r actions=(list printcert)
+declare -r actions=(list printcert checkExp)
 declare -r keystore_password="${RD_CONFIG_KEYSTORE_PASSWORD:-}"
 
 if ! options_parse "$@"
@@ -103,6 +115,9 @@ case "$action" in
 	printcert) 
 		action:printcert "$cert_path"
 	;;	
+	checkExp)
+		action:checkExp "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password"
+	;;
 	*) usage
 	;;
 esac
