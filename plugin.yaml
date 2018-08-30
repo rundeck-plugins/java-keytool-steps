@@ -5,7 +5,7 @@ author: alexh
 date: Tue Feb 16 2016
 providers:
   - name: java-keytool-list-step
-    service: WorkflowNodeStep
+    service: RemoteScriptNodeStep
     title: 'java / keytool / list'
     description: 'Run keytool list action.'
     plugin-type: script
@@ -21,6 +21,7 @@ providers:
         name: keystore_path
         title: Keystore Path
         description: 'path to the jdk keystore'
+        required: true
       - type: String
         name: alias
         title: Alias
@@ -29,12 +30,13 @@ providers:
         name: keystore_password
         title: keystore_password
         description: 'path to keystore password'
+        required: true
         renderingOptions:
           selectionAccessor: "STORAGE_PATH"
           valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
           storage-path-root: "keys"
   - name: java-keytool-printcert-step
-    service: WorkflowNodeStep
+    service: RemoteScriptNodeStep
     title: 'java / keytool / printcert'
     description: 'Run keytool printcert action.'
     plugin-type: script
@@ -50,12 +52,4 @@ providers:
         name: cert_path
         title: Certificate Path
         description: 'path to the jdk keystore'
-      - type: String
-        name: alias
-        title: Alias
-        description: 'alias name'         
-      - type: String
-        name: keystore_password
-        title: keystore_password
-        description: 'path to keystore password'
-
+        required: true
