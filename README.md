@@ -2,7 +2,7 @@
 
 ## Usage
 
-### Pre-Requisite:
+### Pre-Requisite
 
 The remote node's SSH server must be configured to accept RD_* environment variables. This can be read about [here](<https://linux.die.net/man/5/sshd_config>).
 
@@ -18,9 +18,10 @@ Summary, on the remote node:
 
     `sudo service sshd restart`
 
-### Actions:
+### Actions
 
 #### java / keytool / list
+
 Either checks which certificates are in a Java keystore, or gives information about a particular keystore entry.
 
 If no alias is provided in the job definition, it will execute the following for a given keystore:
@@ -30,6 +31,7 @@ If an alias *is* provided, it will execute the following for a given keystore/al
 `keytool -list -v -keystore keystore.jks -alias mydomain`
 
 #### java / keytool / printcert
+
 Gives information about a standalone certificate. Executes the following for a given certificate:
 `keytool -printcert -v -file mydomain.crt`
 
