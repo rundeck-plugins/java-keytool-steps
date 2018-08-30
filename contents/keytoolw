@@ -6,8 +6,7 @@ usage() {
 }
 
 options_parse() {
-  
-    unrecognized_args=()
+	unrecognized_args=()
 
     while (( "$#" > 0 ))
     do
@@ -43,12 +42,14 @@ options_parse() {
     return 0
 }
 
-
 check_keytool() {
+	# If it's executable, use the keytool for the specified JDK
+	#  otherwise, use what's in the $PATH
 	local jdk=$1 keytool=''
-	if [[ -x "$jdk/bin/keytool" ]]
+
+	if [[ -x "$jdk/jre/bin/keytool" ]]
 	then 
-		keytool=$jdk/bin/keytool
+		keytool=$jdk/jre/bin/keytool
 	else
 		# Check the $PATH for it.
 		if ! keytool=$(type -p keytool)
@@ -60,30 +61,32 @@ check_keytool() {
 		printf "ERROR: keytool executable not found."
 		return 1
 	fi
-	printf "%s" "$keytool"
+	printf "%s" $keytool
 	return 0
 }
 
-
 # Check which certificates are in a Java keystore
 action:list() {
+	# Build the arguments list
 	local keystore=$1 alias=$2 password=$3
-	local clopts=(-list -v -keystore "$keystore")
-	[[ -n "$alias" ]] && clopts+=(-alias "$alias")
-	[[ -n "$password" ]] && clopts+=(-storepass "$password")
+	local clopts=( -list -v -keystore "$keystore")
+	[[ -n "$alias" ]] && clopts+=( -alias "$alias")
+	[[ -n "$password" ]] && clopts+=( -storepass "$password")
+
 	# Run it.
-	command "$jdk_home/bin/keytool" "${clopts[@]}"
+	command $keytool "${clopts[@]}"
 }
 
 action:printcert() {
+	# Run the printcert action
 	local cert_file=$1
-	command "$jdk_home/bin/keytool" -printcert -v -file "$cert_file"
+	command $keytool -printcert -v -file "$cert_file"
 }
 
-
-check_keytool "$jdk_home"
+#Begin script execution
 
 declare -r actions=(list printcert)
+declare -r keystore_password="${RD_CONFIG_KEYSTORE_PASSWORD:-}"
 
 if ! options_parse "$@"
 then
@@ -91,7 +94,7 @@ then
 	exit 2
 fi
 
-declare -r keystore_password="${RD_CONFIG_KEYSTORE_PASSWORD:-}"
+keytool=$(check_keytool "$jdk_home")
 
 case "$action" in	
 	list) 
