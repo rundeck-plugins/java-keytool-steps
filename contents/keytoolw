@@ -85,14 +85,49 @@ action:printcert() {
 
 action:checkExp() {
 	# Build the arguments list
-	local keystore=$1 alias=$2 password=$3 keytoolOut=''
+	local keystore=$1 alias=$2 password=$3 
+	local keytoolOut='' expDateString='' dateTrim='' expDate
+	local dateYYYY='' dateMM='' dateDD='' dateMon='' i=0 secondsDiff=0
+	local months=( JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC )
 	local clopts=( -list -v -keystore "$keystore")
 	[[ -n "$alias" ]] && clopts+=( -alias "$alias")
 	[[ -n "$password" ]] && clopts+=( -storepass "$password")
 
-	# Run it.
+	# Run and print it.
 	keytoolOut=$(command $keytool "${clopts[@]}") || { echo $keytoolOut; exit 1; }
-	printf "%s" "$keytoolOut" | awk -v alias="$alias" -Funtil: '/until:/ {print alias ": Expires on" $2;exit;}'
+	expDateString=$(printf "%s" "$keytoolOut" | awk -Funtil: '/until:/ {print $2;exit;}')
+	echo "$alias expires on:$expDateString"
+
+	# Strip leading spaces and capture date. Different versions of java display the 'until' date differently
+	dateTrim=$(echo $expDateString | awk '{print $1}')
+
+	if [[ $dateTrim =~ ^[0-9] ]]
+	then
+		# Date was provided in number format (java8+)
+		dateMM=$( printf %02d `echo $dateTrim | awk -F/ '{print $1}'` )
+		dateDD=$( printf %02d `echo $dateTrim | awk -F/ '{print $2}'` )
+		dateYYYY=$(echo $dateTrim | awk -F/ '{print "20"$3}')
+
+		expDate=$dateYYYY-$dateMM-$dateDD
+	else
+		# Date was provided in word format (<java8). Convert to numeric
+		dateMon=$( echo $expDateString | awk '{print $2}' | tr [a-z] [A-Z] )
+
+		for (( i=0; i<11; i++ )); do
+			[[ $dateMon = ${months[i]} ]] && break;
+		done
+
+		dateMM=` printf %02d $((i+1)) `
+		dateDD=$( printf %02d `echo $expDateString | awk '{print $3}'` )
+		dateYYYY=$( echo $expDateString | awk '{print $6}' )
+
+		expDate=$dateYYYY-$dateMM-$dateDD
+	fi
+	
+	# How many days between today and $expDate?
+	secondsDiff=$(( `date -d $expDate +%s` - `date +%s` ))
+	echo $secondsDiff/86400 | bc
+	# TODO: check against specified threshhold and fail if necessary
 }
 
 #Begin script execution
