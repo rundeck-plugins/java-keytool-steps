@@ -16,6 +16,7 @@ options_parse() {
             --jdk-home)      jdk_home=$2      ; shift 2 ;;
             --keystore-path) keystore_path=$2 ; shift 2 ;;
             --cert-path)     cert_path=$2     ; shift 2 ;;
+			--age-thresh)	 age_thresh=$2    ; shift 2 ;;
             # help option
             -\?|--help)
                 usage
@@ -85,9 +86,9 @@ action:printcert() {
 
 action:checkExp() {
 	# Build the arguments list
-	local keystore=$1 alias=$2 password=$3 
+	local keystore=$1 alias=$2 password=$3 ageThresh=$4
 	local keytoolOut='' expDateString='' dateTrim='' expDate
-	local dateYYYY='' dateMM='' dateDD='' dateMon='' i=0 secondsDiff=0
+	local dateYYYY='' dateMM='' dateDD='' dateMon='' i=0 secondsDiff=0 daysDiff=0
 	local months=( JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC )
 	local clopts=( -list -v -keystore "$keystore")
 	[[ -n "$alias" ]] && clopts+=( -alias "$alias")
@@ -126,8 +127,23 @@ action:checkExp() {
 	
 	# How many days between today and $expDate?
 	secondsDiff=$(( `date -d $expDate +%s` - `date +%s` ))
-	echo $secondsDiff/86400 | bc
-	# TODO: check against specified threshhold and fail if necessary
+	daysDiff=$( echo $secondsDiff/86400 | bc )
+	echo "Your certificate expires in $daysDiff days."
+
+	if [[ -n "$ageThresh" ]]
+	then
+		# check against specified threshhold and fail if necessary
+		if [[ "$daysDiff" -le "$ageThresh" ]]
+		then
+			printf "%s" "It's time to renew your certficate for $alias!" 1>&2
+			exit 3
+		else
+			:
+		fi
+	else
+		:
+	fi
+
 }
 
 #Begin script execution
@@ -151,7 +167,7 @@ case "$action" in
 		action:printcert "$cert_path"
 	;;	
 	checkExp)
-		action:checkExp "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password"
+		action:checkExp "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$age_thresh"
 	;;
 	*) usage
 	;;

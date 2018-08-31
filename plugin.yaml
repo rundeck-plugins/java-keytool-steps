@@ -60,7 +60,7 @@ providers:
     plugin-type: script
     script-interpreter: /usr/bin/env bash
     script-file: keytoolw
-    script-args: --action checkExp --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path}
+    script-args: --action checkExp --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path} --age-thresh ${config.age_thresh}
     config:
       - type: String
         name: keystore_path
@@ -81,6 +81,10 @@ providers:
         title: Alias*
         description: 'Alias name' 
         required: true
+      - type: Integer
+        name: age_thresh
+        title: Age Threshhold (days)
+        description: 'If specified, fail the job if the certificate expires in this many days or less'
       - type: String
         name: jdk_home
         title: JDK Home
