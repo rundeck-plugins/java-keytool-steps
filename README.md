@@ -23,6 +23,7 @@ Summary, on the remote node:
 #### java / keytool / checkExpiration
 
 For a given keystore/alias, displays the expiration date by parsing the output from `keytool -list -v -keystore keystore.jks -alias mydomain`.
+Optionally specify the Age Threshhold (in days) to make the job fail if the specified alias will expire in that many days or less. This will allow you to schedule the job and trigger notifications or workflows when your certificates are nearing their expiration dates.
 
 #### java / keytool / list
 
