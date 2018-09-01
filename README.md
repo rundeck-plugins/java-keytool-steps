@@ -2,7 +2,9 @@
 
 ## Usage
 
-### Pre-Requisite
+### Pre-Requisites
+
+#### Remote node setup
 
 The remote node's SSH server must be configured to accept RD_* environment variables. This can be read about [here](<https://linux.die.net/man/5/sshd_config>).
 
@@ -17,6 +19,10 @@ Summary, on the remote node:
 2. Restart sshd service:
 
     `sudo service sshd restart`
+
+#### Rundeck setup
+
+Create an item in Rundeck's [Key Storage](<https://www.rundeck.com/blog/use-rundecks-key-storage-to-manage-passwords-and-secrets>) that houses your keystore password.
 
 ### Actions
 
