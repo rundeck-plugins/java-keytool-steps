@@ -89,3 +89,100 @@ providers:
         name: jdk_home
         title: JDK Home
         description: 'Path to the jdk. If left blank, will search for the jdk in $PATH.'
+  - name: java-keytool-create-keystore-step
+    service: RemoteScriptNodeStep
+    title: 'java / keytool / create'
+    description: 'Create a new keystore and/or key pair and optionally generate a certificate request'
+    plugin-type: script
+    script-interpreter: /usr/bin/env bash
+    script-file: keytoolw
+    script-args: --action create --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path} --overwrite-keystore ${config.overwrite_keystore}
+    config:
+      - type: String
+        name: keystore_path
+        title: Keystore Path*
+        description: 'Path to the jdk keystore'
+        required: true        
+      - type: Boolean
+        name: overwrite_keystore
+        title: 'Overwrite keystore?'
+        description: 'Overwrite keystore if it exists? If unchecked, will attempt to add alias to existing keystore.'
+      - type: String
+        name: keystore_password
+        title: Keystore Password*
+        description: 'Path to keystore password'
+        required: true
+        renderingOptions:
+          selectionAccessor: "STORAGE_PATH"
+          valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+          storage-path-root: "keys"
+      - type: String
+        name: private_key_password
+        title: Private Key Password*
+        description: 'Path to private key password'
+        required: true
+        renderingOptions:
+          selectionAccessor: "STORAGE_PATH"
+          valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+          storage-path-root: "keys"
+      - type: String
+        name: alias
+        title: Alias*
+        description: 'Alias name' 
+        required: true
+      - type: String
+        name: key_alg
+        title: Key Algorithm [RSA]
+        description: Keypair Algorithm 
+        required: true        
+        default: "RSA"
+      - type: Integer
+        name: key_size
+        title: Key Size [2048]
+        description: Key Size
+        required: true        
+        default: 2048
+      - type: String
+        name: common_name
+        title: Common Name (CN)*
+        description: Common Name
+        required: true
+      - type: String
+        name: org_unit 
+        title: Organization Unit (OU)*
+        description: Organization Unit
+        required: true
+      - type: String
+        name: org_name 
+        title: Organization Name (O)*
+        description: Organization Name
+        required: true
+      - type: String
+        name: loc_name 
+        title: Locality Name (L)*
+        description: Locality Name
+        required: true
+      - type: String
+        name: state_name 
+        title: State Name (ST)*
+        description: State Name
+        required: true
+      - type: String
+        name: country 
+        title: Country (C)*
+        description: Country
+        required: true
+      - type: Integer
+        name: validity_period
+        title: Validity Period (days) [365]
+        description: Validity Period
+        required: true        
+        default: 365
+      - type: String
+        name: san
+        title: Subject Alternative Name (Optional)
+        description: "Comma-separated list of SANs. Ex: dns:hostname.domain.com,dns:hostalias.domain.com,ip:1.1.1.1"
+      - type: String
+        name: jdk_home
+        title: JDK Home
+        description: 'Path to the jdk. If left blank, will search for the jdk in $PATH.'

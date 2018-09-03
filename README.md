@@ -22,7 +22,7 @@ Summary, on the remote node:
 
 #### Rundeck setup
 
-Create an item in Rundeck's [Key Storage](<https://www.rundeck.com/blog/use-rundecks-key-storage-to-manage-passwords-and-secrets>) that houses your keystore password.
+Create an item in Rundeck's [Key Storage](<https://www.rundeck.com/blog/use-rundecks-key-storage-to-manage-passwords-and-secrets>) that houses your keystore password (and private key password, if applicable).
 
 ### Actions
 
@@ -30,6 +30,14 @@ Create an item in Rundeck's [Key Storage](<https://www.rundeck.com/blog/use-rund
 
 For a given keystore/alias, displays the expiration date by parsing the output from `keytool -list -v -keystore keystore.jks -alias mydomain`.
 Optionally specify the Age Threshhold (in days) to make the job fail if the specified alias will expire in that many days or less. This will allow you to schedule the job and trigger notifications or workflows when your certificates are nearing their expiration dates.
+
+#### java / keytool / create
+
+Creates a new Java keystore (JKS) or updates an existing one with a new key pair in the location specified - and optionally creates a certificate request. After providing the necessary inputs in the job step properties, uses the following actions:
+`keytool -genkeypair`
+
+and if applicable:
+`keytool -certreq`
 
 #### java / keytool / list
 
