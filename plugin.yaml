@@ -89,14 +89,14 @@ providers:
         name: jdk_home
         title: JDK Home
         description: 'Path to the jdk. If left blank, will search for the jdk in $PATH.'
-  - name: java-keytool-create-keystore-step
+  - name: java-keytool-create-step
     service: RemoteScriptNodeStep
     title: 'java / keytool / create'
     description: 'Create a new keystore and/or key pair and optionally generate a certificate request'
     plugin-type: script
     script-interpreter: /usr/bin/env bash
     script-file: keytoolw
-    script-args: --action create --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path} --overwrite-keystore ${config.overwrite_keystore}
+    script-args: --action create --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path} --overwrite-keystore ${config.overwrite_keystore} --certreq-path ${config.certreq_path}
     config:
       - type: String
         name: keystore_path
@@ -186,3 +186,7 @@ providers:
         name: jdk_home
         title: JDK Home
         description: 'Path to the jdk. If left blank, will search for the jdk in $PATH.'
+      - type: String
+        name: certreq_path
+        title: Directory to create Certificate Request in
+        description: "If specified, generate a certficicate request and save the certreq to the location specified."
