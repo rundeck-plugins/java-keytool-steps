@@ -39,9 +39,14 @@ Creates a new Java keystore (JKS) or updates an existing one with a new key pair
 and if applicable:
 `keytool -certreq`
 
+#### java / keytool / delete
+
+Deletes an alias from the specified keystore. After providing the necessary inputs in the job step properties, uses the following action:
+`keytool -delete`
+
 #### java / keytool / import
 
-Imports root, intermediate, and/or signed server certificate into the specified keystore. After providing the necessary inputs in the job step properties, uses the following action for each alias specified:
+Imports certificate into the specified keystore. After providing the necessary inputs in the job step properties, uses the following action for the alias specified:
 `keytool -import`
 
 #### java / keytool / list

@@ -19,9 +19,6 @@ options_parse() {
 			--age-thresh)			age_thresh=$2    		; shift 2 ;;
 			--overwrite-keystore)   overwrite_keystore=$2	; shift 2 ;;
 			--certreq-path)		    certreq_path=$2			; shift 2 ;;
-			--server-path)		    server_path=$2			; shift 2 ;;
-			--root-path)		    root_path=$2			; shift 2 ;;
-			--int-path)			    int_path=$2  			; shift 2 ;;
             # help option
             -\?|--help)
                 usage
@@ -191,50 +188,37 @@ action:create() {
 }
 
 action:import() {
-	# Build the arguments list
-	local keytoolOut=''
-	local keystore=$1 storePass=$2 keyPass=$3 rootAlias=$4 rootPath=$5 intAlias=$6 intPath=$7 serverAlias=$8 serverPath=$9 
+	# Import an alias into a keystore
+	local keystore=$1 storePass=$2 keyPass=$3 alias=$4 cert_file=$5 
+	local clopts=( -import -noprompt -trustcacerts -alias "$alias" -file "$cert_file" -keystore "$keystore" -storepass "$storePass" -keypass "$keyPass" )
 
-	# process root certificate
-	if [[ -n "$rootAlias" ]] && [[ -n "$rootPath" ]]
-	then
-		local rootClopts=( -import -noprompt -trustcacerts -alias "$rootAlias" -file "$rootPath" -keystore "$keystore" -storepass "$storePass" )
-		printf "%s\n" "Importing alias $rootAlias..."
-		keytoolOut=$(command $keytool "${rootClopts[@]}") || { echo $keytoolOut; exit 1; }
-	else
-		:
-	fi
-
-	# process int certificate
-	if [[ -n "$intAlias" ]] && [[ -n "$intPath" ]]
-	then
-		local intClopts=( -import -noprompt -trustcacerts -alias "$intAlias" -file "$intPath" -keystore "$keystore" -storepass "$storePass" )
-		printf "%s\n" "Importing alias $intAlias..."
-		keytoolOut=$(command $keytool "${intClopts[@]}") || { echo $keytoolOut; exit 1; }
-	else
-		:
-	fi
-
-	# process server certificate
-	if [[ -n "$serverAlias" ]] && [[ -n "$serverPath" ]]
-	then
-		local serverClopts=( -import -noprompt -trustcacerts -alias "$serverAlias" -file "$serverPath" -keystore "$keystore" -storepass "$storePass" -keypass "$keyPass" )
-		printf "%s\n" "Importing alias $serverAlias..."
-		keytoolOut=$(command $keytool "${serverClopts[@]}") || { echo $keytoolOut; exit 1; }
-	else
-		:
-	fi
+	printf "%s\n" "Importing alias $alias..."
+	command $keytool "${clopts[@]}"
 }
 
 action:delete() {
 	# Delete an alias from a keystore
+	local keytoolOut=''
 	local keystore=$1 alias=$2 storePass=$3
+
 	printf "%s\n" "Deleting alias $alias if it already exists..."
-	command $keytool -delete -noprompt -alias "$alias" -keystore "$keystore" -storepass "$storePass"
+	keytoolOut=$(command $keytool -delete -noprompt -alias "$alias" -keystore "$keystore" -storepass "$storePass") || { 
+		echo "keytoolOut=$keytoolOut"
+		if [[ `grep 'Alias .* does not exist' <<< "$keytoolOut"` ]]
+		then
+			# Acceptable, do not fail.
+			printf "%s" "Alias does not exist. Nothing to delete."
+		else
+			# Something else went wrong. Fail.
+			printf "%s" "$keytoolOut"
+			exit 1
+		fi
+	}
+
 }
 #Begin script execution
 
-declare -r actions=(list printcert checkExp create import)
+declare -r actions=(list printcert checkExp create import delete)
 declare -r keystore_password="${RD_CONFIG_KEYSTORE_PASSWORD:-}"
 declare -r private_key_password="${RD_CONFIG_PRIVATE_KEY_PASSWORD:-}"
 
@@ -260,7 +244,10 @@ case "$action" in
 		action:create "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$private_key_password" "${RD_CONFIG_KEY_ALG:-}" "${RD_CONFIG_KEY_SIZE:-}" "${RD_CONFIG_COMMON_NAME:-}" "${RD_CONFIG_ORG_UNIT:-}" "${RD_CONFIG_ORG_NAME:-}" "${RD_CONFIG_LOC_NAME:-}" "${RD_CONFIG_STATE_NAME:-}" "${RD_CONFIG_COUNTRY:-}" "${RD_CONFIG_VALIDITY_PERIOD:-}" "${RD_CONFIG_SAN:-}" "$overwrite_keystore" "$certreq_path"
 	;;
 	import) 
-		action:import "$keystore_path" "$keystore_password" "$private_key_password" "${RD_CONFIG_ROOT_ALIAS:-}" "${RD_CONFIG_ROOT_PATH:-}" "${RD_CONFIG_INT_ALIAS:-}" "${RD_CONFIG_INT_PATH:-}" "${RD_CONFIG_SERVER_ALIAS:-}" "${RD_CONFIG_SERVER_PATH:-}"
+		action:import "$keystore_path" "$keystore_password" "$private_key_password" "${RD_CONFIG_ALIAS:-}" "$cert_path" 
+	;;
+	delete)
+		action:delete "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password"
 	;;
 	*) usage
 	;;
