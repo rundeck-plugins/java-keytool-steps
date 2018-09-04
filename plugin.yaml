@@ -190,3 +190,63 @@ providers:
         name: certreq_path
         title: Directory to create Certificate Request in
         description: "If specified, generate a certficicate request and save the certreq to the location specified."
+  - name: java-keytool-import-step
+    service: RemoteScriptNodeStep
+    title: 'java / keytool / import'
+    description: 'Import a root, intermediate, and/or a signed server certificate into an existing keystore'
+    plugin-type: script
+    script-interpreter: /usr/bin/env bash
+    script-file: keytoolw
+    script-args: --action import --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path} --root-path ${config.root_path} --int-path ${config.int_path} --server-path ${config.server_path}
+    config:
+      - type: String
+        name: keystore_path
+        title: Keystore Path*
+        description: 'Path to the jdk keystore'
+        required: true        
+      - type: String
+        name: keystore_password
+        title: Keystore Password*
+        description: 'Path to keystore password'
+        required: true
+        renderingOptions:
+          selectionAccessor: "STORAGE_PATH"
+          valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+          storage-path-root: "keys"
+      - type: String
+        name: private_key_password
+        title: Private Key Password*
+        description: 'Path to private key password'
+        required: true
+        renderingOptions:
+          selectionAccessor: "STORAGE_PATH"
+          valueConversion: "STORAGE_PATH_AUTOMATIC_READ"
+          storage-path-root: "keys"
+      - type: String
+        name: root_alias
+        title: Root Alias
+        description: 'Root Alias name. If left blank, will not import root certificate.' 
+      - type: String
+        name: root_path
+        title: Root Certificate Path
+        description: 'Path to the root certificate. If left blank, will not import root certificate.'
+      - type: String
+        name: int_alias
+        title: Intermediate Alias
+        description: 'Intermediate Alias name. If left blank, will not import intermediate certificate.' 
+      - type: String
+        name: int_path
+        title: Int Certificate Path
+        description: 'Path to the intermediate certficiate. If left blank, will not import intermediate certificate.'
+      - type: String
+        name: server_alias
+        title: Server Alias
+        description: 'Server Alias name. If left blank, will not import the server certificate.'
+      - type: String
+        name: server_path
+        title: Server Certificate Path
+        description: 'Path to the server certificate. If left blank, will not import server certificate.'
+      - type: String
+        name: jdk_home
+        title: JDK Home
+        description: 'Path to the jdk. If left blank, will search for the jdk in $PATH.'

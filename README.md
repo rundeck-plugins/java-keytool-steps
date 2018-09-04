@@ -39,6 +39,11 @@ Creates a new Java keystore (JKS) or updates an existing one with a new key pair
 and if applicable:
 `keytool -certreq`
 
+#### java / keytool / import
+
+Imports root, intermediate, and/or signed server certificate into the specified keystore. After providing the necessary inputs in the job step properties, uses the following action for each alias specified:
+`keytool -import`
+
 #### java / keytool / list
 
 Either checks which certificates are in a Java keystore, or gives information about a particular keystore entry.
