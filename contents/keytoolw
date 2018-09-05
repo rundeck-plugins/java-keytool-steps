@@ -18,7 +18,6 @@ options_parse() {
             --cert-path)     		cert_path=$2     		; shift 2 ;;
 			--age-thresh)			age_thresh=$2    		; shift 2 ;;
 			--overwrite-keystore)   overwrite_keystore=$2	; shift 2 ;;
-			--certreq-path)		    certreq_path=$2			; shift 2 ;;
             # help option
             -\?|--help)
                 usage
@@ -241,7 +240,7 @@ case "$action" in
 		action:checkExp "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$age_thresh"
 	;;
 	create)
-		action:create "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$private_key_password" "${RD_CONFIG_KEY_ALG:-}" "${RD_CONFIG_KEY_SIZE:-}" "${RD_CONFIG_COMMON_NAME:-}" "${RD_CONFIG_ORG_UNIT:-}" "${RD_CONFIG_ORG_NAME:-}" "${RD_CONFIG_LOC_NAME:-}" "${RD_CONFIG_STATE_NAME:-}" "${RD_CONFIG_COUNTRY:-}" "${RD_CONFIG_VALIDITY_PERIOD:-}" "${RD_CONFIG_SAN:-}" "$overwrite_keystore" "$certreq_path"
+		action:create "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$private_key_password" "${RD_CONFIG_KEY_ALG:-}" "${RD_CONFIG_KEY_SIZE:-}" "${RD_CONFIG_COMMON_NAME:-}" "${RD_CONFIG_ORG_UNIT:-}" "${RD_CONFIG_ORG_NAME:-}" "${RD_CONFIG_LOC_NAME:-}" "${RD_CONFIG_STATE_NAME:-}" "${RD_CONFIG_COUNTRY:-}" "${RD_CONFIG_VALIDITY_PERIOD:-}" "${RD_CONFIG_SAN:-}" "$overwrite_keystore" "${RD_CONFIG_CERTREQ_PATH:-}"
 	;;
 	import) 
 		action:import "$keystore_path" "$keystore_password" "$private_key_password" "${RD_CONFIG_ALIAS:-}" "$cert_path" 

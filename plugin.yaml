@@ -96,7 +96,7 @@ providers:
     plugin-type: script
     script-interpreter: /usr/bin/env bash
     script-file: keytoolw
-    script-args: --action create --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path} --overwrite-keystore ${config.overwrite_keystore} --certreq-path ${config.certreq_path}
+    script-args: --action create --jdk-home ${config.jdk_home} --keystore-path ${config.keystore_path} --overwrite-keystore ${config.overwrite_keystore} 
     config:
       - type: String
         name: keystore_path
