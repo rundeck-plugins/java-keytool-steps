@@ -34,7 +34,7 @@ options_parse() {
     # Set defaultable options.
 
     # Check required options are set
-	if [[ " ${actions[@]} " =~ " ${action} " ]]
+	if [[ "${actions[*]}" =~ ${action} ]]
 	then
 		:
 	else
@@ -63,7 +63,7 @@ check_keytool() {
 		printf "ERROR: keytool executable not found."
 		return 1
 	fi
-	printf "%s" $keytool
+	printf "%s" "$keytool"
 	return 0
 }
 
@@ -76,13 +76,13 @@ action:list() {
 	[[ -n "$password" ]] && clopts+=( -storepass "$password")
 
 	# Run it.
-	command $keytool "${clopts[@]}"
+	command "$keytool" "${clopts[@]}"
 }
 
 action:printcert() {
 	# Run the printcert action
 	local cert_file=$1
-	command $keytool -printcert -v -file "$cert_file"
+	command "$keytool" -printcert -v -file "$cert_file"
 }
 
 action:checkExp() {
@@ -96,38 +96,38 @@ action:checkExp() {
 	[[ -n "$password" ]] && clopts+=( -storepass "$password")
 
 	# Run and print it.
-	keytoolOut=$(command $keytool "${clopts[@]}") || { echo $keytoolOut; exit 1; }
+	keytoolOut=$(command "$keytool" "${clopts[@]}") || { printf "%s\n" "$keytoolOut"; exit 1; }
 	expDateString=$(printf "%s" "$keytoolOut" | awk -Funtil: '/until:/ {print $2;exit;}')
 	echo "$alias expires on:$expDateString"
 
 	# Strip leading spaces and capture date. Different versions of java display the 'until' date differently
-	dateTrim=$(echo $expDateString | awk '{print $1}')
+	dateTrim=$(echo "$expDateString" | awk '{print $1}')
 
 	if [[ $dateTrim =~ ^[0-9] ]]
 	then
 		# Date was provided in number format (java8+)
-		dateMM=$( printf %02d `echo $dateTrim | awk -F/ '{print $1}'` )
-		dateDD=$( printf %02d `echo $dateTrim | awk -F/ '{print $2}'` )
-		dateYYYY=$(echo $dateTrim | awk -F/ '{print "20"$3}')
+		dateMM=$( printf %02d "$(echo "$dateTrim" | awk -F/ '{print $1}')" )
+		dateDD=$( printf %02d "$(echo "$dateTrim" | awk -F/ '{print $2}')" )
+		dateYYYY=$(echo "$dateTrim" | awk -F/ '{print "20"$3}')
 
 		expDate=$dateYYYY-$dateMM-$dateDD
 	else
 		# Date was provided in word format (<java8). Convert to numeric
-		dateMon=$( echo $expDateString | awk '{print $2}' | tr [a-z] [A-Z] )
+		dateMon=$( echo "$expDateString" | awk '{print $2}' | tr '[:lower:]' '[:upper:]' )
 
 		for (( i=0; i<11; i++ )); do
-			[[ $dateMon = ${months[i]} ]] && break;
+			[[ $dateMon = "${months[i]}" ]] && break;
 		done
 
-		dateMM=` printf %02d $((i+1)) `
-		dateDD=$( printf %02d `echo $expDateString | awk '{print $3}'` )
-		dateYYYY=$( echo $expDateString | awk '{print $6}' )
+		dateMM=$( printf %02d $((i+1)) ) 
+		dateDD=$( printf %02d "$(echo "$expDateString" | awk '{print $3}')" )
+		dateYYYY=$( echo "$expDateString" | awk '{print $6}' )
 
 		expDate=$dateYYYY-$dateMM-$dateDD
 	fi
 	
 	# How many days between today and $expDate?
-	secondsDiff=$(( `date -d $expDate +%s` - `date +%s` ))
+	secondsDiff=$(( $(date -d "$expDate" +%s) - $(date +%s) ))
 	daysDiff=$( echo $secondsDiff/86400 | bc )
 	printf "%s\n" "Your certificate expires in $daysDiff days."
 
@@ -148,14 +148,15 @@ action:checkExp() {
 
 action:create() {
 	# Build the arguments list
-	local keytoolOut=''
+	local keytoolOut='' dname=''
 	local keystore=$1 alias=$2 storePass=$3 keyPass=$4 keyAlg=$5 keySize=$6 cn=$7 ou=$8 org=$9 
 	local loc=${10} state=${11} country=${12} validPd=${13} san=${14} overwrite=${15} certreqDir=${16}
 
-	local dname=`printf "%s" \"CN="$cn", OU="$ou", O="$org", L="$loc", S="$state", C="$country"\"`
+	dname=$( printf "%s" \"CN="$cn", OU="$ou", O="$org", L="$loc", S="$state", C="$country"\" )
+
 	local clopts=( -genkeypair -noprompt -alias "$alias" -keyalg "$keyAlg" -keysize "$keySize" -keystore "$keystore" -dname "$dname" )
 	clopts+=( -validity "$validPd" -storepass \""$storePass"\" -keypass \""$keyPass"\" )
-	[[ -n "$san" ]] && clopts+=( -ext san="$san")
+	[[ -n "$san" ]] && clopts+=( -ext "san=$san")
 
 	# Delete the keystore if it already exists and user checked override flag
 	if [[ -e "$keystore" ]] && [[ "$overwrite" = "true" ]]
@@ -168,7 +169,7 @@ action:create() {
 
 	# Create keystore
 	printf "%s\n" "Creating new keystore: $keystore"
-	keytoolOut=$(eval $keytool "${clopts[@]}") || { echo $keytoolOut; exit 1; }
+	keytoolOut=$(eval "$keytool" "${clopts[@]}") || { printf "%s\n" "$keytoolOut"; exit 1; }
 
 	# If specified, generate a certificate request
 	if [[ -n "$certreqDir" ]]
@@ -176,9 +177,9 @@ action:create() {
 		printf "%s\n" "Generating Certificate Request:"
 		[[ -w "$certreqDir" ]] || { printf "%s\n" "Path $certreqDir doesn't exist or is not writeable." 1>&2; exit 1; }
 		clopts=( -certreq -noprompt -alias "$alias" -keystore "$keystore" -file "$certreqDir"/certreq.csr -storepass \""$storePass"\" -keypass \""$keyPass"\" )
-		[[ -n "$san" ]] && clopts+=( -ext san="$san")
+		[[ -n "$san" ]] && clopts+=( -ext "san=$san")
 
-		keytoolOut=$(eval $keytool "${clopts[@]}") || { echo $keytoolOut; exit 1; }
+		keytoolOut=$(eval "$keytool" "${clopts[@]}") || { printf "%s\n" "$keytoolOut"; exit 1; }
 
 		cat "$certreqDir"/certreq.csr
 	else
@@ -192,7 +193,7 @@ action:import() {
 	local clopts=( -import -noprompt -trustcacerts -alias "$alias" -file "$cert_file" -keystore "$keystore" -storepass "$storePass" -keypass "$keyPass" )
 
 	printf "%s\n" "Importing alias $alias..."
-	command $keytool "${clopts[@]}"
+	command "$keytool" "${clopts[@]}"
 }
 
 action:delete() {
@@ -201,9 +202,9 @@ action:delete() {
 	local keystore=$1 alias=$2 storePass=$3
 
 	printf "%s\n" "Deleting alias $alias if it already exists..."
-	keytoolOut=$(command $keytool -delete -noprompt -alias "$alias" -keystore "$keystore" -storepass "$storePass") || { 
-		echo "keytoolOut=$keytoolOut"
-		if [[ `grep 'Alias .* does not exist' <<< "$keytoolOut"` ]]
+	keytoolOut=$(command "$keytool" -delete -noprompt -alias "$alias" -keystore "$keystore" -storepass "$storePass") || { 
+		printf "%s\n" "keytoolOut=$keytoolOut"
+		if grep -q 'Alias .* does not exist' <<< "$keytoolOut"
 		then
 			# Acceptable, do not fail.
 			printf "%s" "Alias does not exist. Nothing to delete."
