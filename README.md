@@ -2,8 +2,6 @@
 
 ## Usage
 
----
-
 ### Pre-Requisites
 
 #### Remote node setup
@@ -68,9 +66,8 @@ If an alias *is* provided, it will execute the following for a given keystore/al
 Gives information about a standalone certificate. Executes the following for a given certificate:
 `keytool -printcert -v -file mydomain.crt`
 
-### Usage Examples
+## Examples
 
----
 The included actions can be used on their own or in combination with each other or other steps. Here are a couple of examples:
 
 **Monitoring Your SSL Certificates - simple method**
@@ -121,8 +118,6 @@ For a workflow that will automatically create a new keystore & certificate reque
     4.5 Step to restart the web server
 
 ## Building
-
----
 
 1. To build the plugin, simply zip it but exclude the .git files:
 
