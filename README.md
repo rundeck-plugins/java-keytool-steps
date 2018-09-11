@@ -36,6 +36,7 @@ Optionally specify the Age Threshhold (in days) to make the job fail if the spec
 #### java / keytool / create
 
 Creates a new Java keystore (JKS) or updates an existing one with a new key pair in the location specified - and optionally creates a certificate request. After providing the necessary inputs in the job step properties, uses the following actions:
+
 `keytool -genkeypair`
 
 and if specified:
@@ -44,11 +45,13 @@ and if specified:
 #### java / keytool / delete
 
 Deletes an alias from the specified keystore. After providing the necessary inputs in the job step properties, uses the following action:
+
 `keytool -delete`
 
 #### java / keytool / import
 
 Imports certificate into the specified keystore. After providing the necessary inputs in the job step properties, uses the following action for the alias specified:
+
 `keytool -import`
 
 #### java / keytool / list
@@ -56,21 +59,25 @@ Imports certificate into the specified keystore. After providing the necessary i
 Either checks which certificates are in a Java keystore, or gives information about a particular keystore entry.
 
 If no alias is provided in the job definition, it will execute the following for a given keystore:
+
 `keytool -list -v -keystore keystore.jks`
 
 If an alias *is* provided, it will execute the following for a given keystore/alias:
+
 `keytool -list -v -keystore keystore.jks -alias mydomain`
 
 #### java / keytool / printcert
 
 Gives information about a standalone certificate. Executes the following for a given certificate:
+
 `keytool -printcert -v -file mydomain.crt`
 
 ## Examples
 
 The included actions can be used on their own or in combination with each other or other steps. Here are a couple of examples:
 
-**Monitoring Your SSL Certificates - simple method**
+### Monitoring Your SSL Certificates - simple method
+
 For a job that will notify you when an SSL certificate is nearing it's expiration date, create a job with the following step(s):
 
 1. `java / keytool / checkExpiration`
@@ -79,7 +86,8 @@ For a job that will notify you when an SSL certificate is nearing it's expiratio
 
     Schedule the job to run on a schedule, e.g. every Sunday night @ 23:59.
 
-**Monitoring Your SSL Certificates - advanced method**
+### Monitoring Your SSL Certificates - advanced method
+
 For a workflow that will automatically create a new keystore & certificate request when your certs hit a certain threshhold, plus a job that will import the newly signed certs into your keystore, create a workflow like this:
 
 1. Schedule a job with the following steps to monitor your certificate:
@@ -117,7 +125,7 @@ For a workflow that will automatically create a new keystore & certificate reque
         * the Private Key Password
 
     4.4 Step to copy the new keystore to the "live" location.
-    
+
     4.5 Step to restart the web server
 
 ## Building
