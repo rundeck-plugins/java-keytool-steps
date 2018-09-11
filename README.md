@@ -83,6 +83,7 @@ For a job that will notify you when an SSL certificate is nearing it's expiratio
 For a workflow that will automatically create a new keystore & certificate request when your certs hit a certain threshhold, plus a job that will import the newly signed certs into your keystore, create a workflow like this:
 
 1. Schedule a job with the following steps to monitor your certificate:
+
     1.1. `java / keytool / checkExpiration`
     * Set job step properties to point to your keystore and alias, and specify a notification threshhold (e.g. 30 days)
     * On error, add a `java / keytool / create` step to create a new keystore and certificate request
@@ -93,6 +94,7 @@ For a workflow that will automatically create a new keystore & certificate reque
 2. When the certificate nears the age threshhold the job will fail, generate a certificate request, and email it to you.
 3. Process the certificate request with your Certificate Authority of choice. Save the resulting root, intermediate, and signed server certificates to a directory that the target server has access to.
 4. Execute/schedule a job with the following steps to process the updated certs:
+
     4.1 `java / keytool / import` - root
     * In the job step properties, list:
         * the path to the temporary keystore created in step 1.1
@@ -115,6 +117,7 @@ For a workflow that will automatically create a new keystore & certificate reque
         * the Private Key Password
 
     4.4 Step to copy the new keystore to the "live" location.
+    
     4.5 Step to restart the web server
 
 ## Building
