@@ -150,13 +150,14 @@ action:create() {
 	# Build the arguments list
 	local keytoolOut='' dname=''
 	local keystore=$1 alias=$2 storePass=$3 keyPass=$4 keyAlg=$5 keySize=$6 cn=$7 ou=$8 org=$9 
-	local loc=${10} state=${11} country=${12} validPd=${13} san=${14} overwrite=${15} certreqDir=${16}
+	local loc=${10} state=${11} country=${12} validPd=${13} san=${14} overwrite=${15} certreqDir=${16} keyUsage=${17}
 
 	dname=$( printf "%s" \"CN="$cn", OU="$ou", O="$org", L="$loc", S="$state", C="$country"\" )
 
 	local clopts=( -genkeypair -noprompt -alias "$alias" -keyalg "$keyAlg" -keysize "$keySize" -keystore "$keystore" -dname "$dname" )
 	clopts+=( -validity "$validPd" -storepass \""$storePass"\" -keypass \""$keyPass"\" )
-	[[ -n "$san" ]] && clopts+=( -ext "san=$san")
+	[[ -n "$san" ]] && clopts+=( -ext "san=$san" )
+	[[ -n "$keyUsage" ]] && clopts+=( -ext "KeyUsage=$keyUsage" )
 
 	# Delete the keystore if it already exists and user checked override flag
 	if [[ -e "$keystore" ]] && [[ "$overwrite" = "true" ]]
@@ -177,7 +178,8 @@ action:create() {
 		printf "%s\n" "Generating Certificate Request:"
 		[[ -w "$certreqDir" ]] || { printf "%s\n" "Path $certreqDir doesn't exist or is not writeable." 1>&2; exit 1; }
 		clopts=( -certreq -noprompt -alias "$alias" -keystore "$keystore" -file "$certreqDir"/certreq.csr -storepass \""$storePass"\" -keypass \""$keyPass"\" )
-		[[ -n "$san" ]] && clopts+=( -ext "san=$san")
+		[[ -n "$san" ]] && clopts+=( -ext "san=$san" )
+		[[ -n "$keyUsage" ]] && clopts+=( -ext "KeyUsage=$keyUsage" )
 
 		keytoolOut=$(eval "$keytool" "${clopts[@]}") || { printf "%s\n" "$keytoolOut"; exit 1; }
 
@@ -241,7 +243,7 @@ case "$action" in
 		action:checkExp "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$age_thresh"
 	;;
 	create)
-		action:create "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$private_key_password" "${RD_CONFIG_KEY_ALG:-}" "${RD_CONFIG_KEY_SIZE:-}" "${RD_CONFIG_COMMON_NAME:-}" "${RD_CONFIG_ORG_UNIT:-}" "${RD_CONFIG_ORG_NAME:-}" "${RD_CONFIG_LOC_NAME:-}" "${RD_CONFIG_STATE_NAME:-}" "${RD_CONFIG_COUNTRY:-}" "${RD_CONFIG_VALIDITY_PERIOD:-}" "${RD_CONFIG_SAN:-}" "$overwrite_keystore" "${RD_CONFIG_CERTREQ_PATH:-}"
+		action:create "$keystore_path" "${RD_CONFIG_ALIAS:-}" "$keystore_password" "$private_key_password" "${RD_CONFIG_KEY_ALG:-}" "${RD_CONFIG_KEY_SIZE:-}" "${RD_CONFIG_COMMON_NAME:-}" "${RD_CONFIG_ORG_UNIT:-}" "${RD_CONFIG_ORG_NAME:-}" "${RD_CONFIG_LOC_NAME:-}" "${RD_CONFIG_STATE_NAME:-}" "${RD_CONFIG_COUNTRY:-}" "${RD_CONFIG_VALIDITY_PERIOD:-}" "${RD_CONFIG_SAN:-}" "$overwrite_keystore" "${RD_CONFIG_CERTREQ_PATH:-}" "${RD_CONFIG_KEY_USAGE:-}"
 	;;
 	import) 
 		action:import "$keystore_path" "$keystore_password" "$private_key_password" "${RD_CONFIG_ALIAS:-}" "$cert_path" 
