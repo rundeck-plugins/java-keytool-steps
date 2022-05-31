@@ -89,7 +89,7 @@ action:checkExp() {
 	# Build the arguments list
 	local keystore=$1 alias=$2 password=$3 ageThresh=$4
 	local keytoolOut='' expDateString='' dateTrim='' expDate
-	local dateYYYY='' dateMM='' dateDD='' dateMon='' i=0 secondsDiff=0 daysDiff=0
+	local dateYYYY='' dateMM='' dateDD='' dateDDTemp='' dateMon='' i=0 secondsDiff=0 daysDiff=0
 	local months=( JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC )
 	local clopts=( -list -v -keystore "$keystore")
 	[[ -n "$alias" ]] && clopts+=( -alias "$alias")
@@ -120,7 +120,8 @@ action:checkExp() {
 		done
 
 		dateMM=$( printf %02d $((i+1)) ) 
-		dateDD=$( printf %02d "$(echo "$expDateString" | awk '{print $3}')" )
+		dateDDTemp="$(echo "$expDateString" | awk '{print $3}')"
+		dateDD=$( printf %02d "$(echo "${dateDDTemp#0}")" ) #strip leading zeroes before feeding to printf
 		dateYYYY=$( echo "$expDateString" | awk '{print $6}' )
 
 		expDate=$dateYYYY-$dateMM-$dateDD

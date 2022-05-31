@@ -1,4 +1,4 @@
-# Job Step plugin to wrap common Java keytool commands (Linux/Unix)
+# Rundeck Job Step plugin to wrap common Java keytool commands (Linux/Unix)
 
 ## Usage
 
