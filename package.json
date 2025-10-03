@@ -1,0 +1,28 @@
+{
+  "name": "java-keytool-steps",
+  "version": "1.1.0",
+  "description": "Rundeck Job Step plugin to wrap common Java keytool commands (Linux/Unix)",
+  "main": "plugin.yaml",
+  "scripts": {
+    "test": "echo \"No tests specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rundeck-plugins/java-keytool-steps.git"
+  },
+  "keywords": [
+    "rundeck",
+    "plugin",
+    "keytool",
+    "java",
+    "security"
+  ],
+  "author": "alexh and csinks",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/rundeck-plugins/java-keytool-steps/issues"
+  },
+  "homepage": "https://github.com/rundeck-plugins/java-keytool-steps#readme",
+  "dependencies": {},
+  "devDependencies": {}
+}
