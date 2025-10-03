@@ -1,5 +1,11 @@
 # Rundeck Job Step plugin to wrap common Java keytool commands (Linux/Unix)
 
+## Security Scanning
+
+This repository includes a `package.json` file to enable security vulnerability scanning with Snyk. While this is primarily a bash script-based Rundeck plugin, the `package.json` file allows automated security tools to detect and monitor the repository for potential vulnerabilities in any future dependencies that may be added.
+
+The `package.json` file currently contains no actual Node.js dependencies - it exists solely to make this repository scannable by security tools as part of our security compliance requirements.
+
 ## Usage
 
 ### Pre-Requisites
