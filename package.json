@@ -17,7 +17,7 @@
     "java",
     "security"
   ],
-  "author": "alexh and csinks",
+  "author": "Rundeck Engineering",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/rundeck-plugins/java-keytool-steps/issues"
